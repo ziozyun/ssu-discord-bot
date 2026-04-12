@@ -50,16 +50,23 @@ function buildReportCommandResponse(summary) {
       value: "Поки не налаштовано жодного типу звіту для обробки.",
     });
   } else {
-    embed.addFields(
-      summary.reports.map((report) => ({
-        name: report.reportId,
-        value: formatReportResult(report),
-      })),
-    );
-    embed.addFields({
-      name: "Запис у таблицю",
-      value: `Рядків: ${summary.writeResult?.updatedRows || 0}`,
-    });
+    // 🔥 формуємо поля
+    const fields = summary.reports.map((report) => ({
+      name: `📊 ${report.reportId}`,
+      value: formatReportResult(report),
+      inline: true,
+    }));
+
+    // 🔥 щоб завжди було рівно 2 в ряд
+    if (fields.length % 2 !== 0) {
+      fields.push({
+        name: "\u200B",
+        value: "\u200B",
+        inline: true,
+      });
+    }
+
+    embed.addFields(fields);
   }
 
   return {
