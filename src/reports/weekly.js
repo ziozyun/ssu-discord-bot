@@ -38,76 +38,80 @@ const END_ROW = 53;
 
 // 🔥 ГОЛОВНА МАПА (❗ прибрав всі || 0)
 const COLUMN_MAP = {
-  [VEHICLE_ACTIVITY_REPORT_ID]: { column: "D" },
-  [ARREST_REPORT_ID]: { column: "E" },
+  [VEHICLE_ACTIVITY_REPORT_ID]: { column: "D" }, // Угонка/SOT W/Фургон
+  [ARREST_REPORT_ID]: { column: "E" }, // Арешт
 
   [`${INTERROGATION_REPORT_ID}_conducted`]: {
-    column: "F",
+    column: "F", // Проведення допиту
     getValue: (c) => c[INTERROGATION_REPORT_ID]?.conducted,
   },
 
   [`${INTERROGATION_REPORT_ID}_participated`]: {
-    column: "G",
+    column: "G", // Участь в допиті
     getValue: (c) => c[INTERROGATION_REPORT_ID]?.participated,
   },
 
-  [SEARCH_REPORT_ID]: { column: "H" },
+  [SEARCH_REPORT_ID]: { column: "H" }, // Обшук
 
   [`${NEGOTIATION_REPORT_ID}_controlled`]: {
-    column: "I",
+    column: "I", // Участь в організації та контролі перемовин
     getValue: (c) => c[NEGOTIATION_REPORT_ID]?.controlled,
   },
 
   [`${NEGOTIATION_REPORT_ID}_conducted`]: {
-    column: "J",
+    column: "J", // Проведення перемовин
     getValue: (c) => c[NEGOTIATION_REPORT_ID]?.conducted,
   },
 
   [`${TRUCK_BATTLE_REPORT_ID}_failed`]: {
-    column: "K",
+    column: "K", // Неуспішне БЗВ
     getValue: (c) => c[TRUCK_BATTLE_REPORT_ID]?.failed,
   },
 
   [`${TRUCK_BATTLE_REPORT_ID}_successful`]: {
-    column: "L",
+    column: "L", // Успішне БЗВ
     getValue: (c) => c[TRUCK_BATTLE_REPORT_ID]?.successful,
   },
 
   [`${HOSTAGE_RESCUE_REPORT_ID}_failed`]: {
-    column: "M",
+    column: "M", // Неуспішне ВЗХ
     getValue: (c) => c[HOSTAGE_RESCUE_REPORT_ID]?.failed,
   },
 
   [`${HOSTAGE_RESCUE_REPORT_ID}_successful`]: {
-    column: "N",
+    column: "N", // Успішне ВЗХ
     getValue: (c) => c[HOSTAGE_RESCUE_REPORT_ID]?.successful,
   },
 
-  [AIRCRAFT_CARRIER_DEFENSE_REPORT_ID]: { column: "O" },
-  [SUPPLY_REPORT_ID]: { column: "P" },
-  [PATROL_REPORT_ID]: { column: "Q" },
+  [AIRCRAFT_CARRIER_DEFENSE_REPORT_ID]: { column: "O" }, // ФЗ/ЗАХИСТ АВІАНОСЦЯ
+  [SUPPLY_REPORT_ID]: { column: "P" }, // Постачання
+  [PATROL_REPORT_ID]: { column: "Q" }, // Патруль
 
   [`${PLANE_CRASH_REPORT_ID}_participation`]: {
-    column: "R",
+    column: "R", // Крах літака (участь)
     getValue: (c) => c[PLANE_CRASH_REPORT_ID]?.participation,
   },
 
   [`${PLANE_CRASH_REPORT_ID}_boxes`]: {
-    column: "S",
+    column: "S", // Крах літака (ящики)
     getValue: (c) => c[PLANE_CRASH_REPORT_ID]?.boxes,
   },
 
-  [DUTY_REPORT_ID]: { column: "T" },
-  [RAID_REPORT_ID]: { column: "U" },
-  [PURCHASE_REPORT_ID]: { column: "V" },
+  [DUTY_REPORT_ID]: { column: "T" }, // Чергування
 
-  [BUSINESS_DEFENSE_REPORT_ID]: { column: "AB" },
-  [RP_ACTIVITY_REPORT_ID]: { column: "AC" },
-  [AGITATION_REPORT_ID]: { column: "AD" },
-  [HIRING_REPORT_ID]: { column: "AE" },
-  [VRU_REPORT_ID]: { column: "AF" },
-  [SS_CREATION_REPORT_ID]: { column: "AG" },
-  [EXAMS_REPORT_ID]: { column: "AH" },
+  // УВАГА: RAID не U, а X
+  [RAID_REPORT_ID]: { column: "X" }, // Рейд
+
+  // УВАГА: PURCHASE не V, а Y
+  [PURCHASE_REPORT_ID]: { column: "Y" }, // Участь в закупці
+
+  [BUSINESS_DEFENSE_REPORT_ID]: { column: "AE" }, // Участь у відбитті бізнесу
+  [RP_ACTIVITY_REPORT_ID]: { column: "AF" }, // РП активність
+  [AGITATION_REPORT_ID]: { column: "AG" }, // Агітація громадян (держ. хвиля)
+  [HIRING_REPORT_ID]: { column: "AH" }, // Прийняття працівника
+  [VRU_REPORT_ID]: { column: "AI" }, // Участь у ВРУ
+  [SS_CREATION_REPORT_ID]: { column: "AJ" }, // Створення СС-К/І
+  [EXAMS_REPORT_ID]: { column: "AK" }, // Проведення іспитів
 };
 
 async function runWeeklyReports({
