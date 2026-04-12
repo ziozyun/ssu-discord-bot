@@ -2,9 +2,113 @@ const { REPORT_DEFINITIONS } = require("./definitions");
 const { getCurrentReportPeriod } = require("./period");
 const { collectReport } = require("./runner");
 const { writeSheetRows } = require("./sheets");
-const { buildWeeklySummaryHeader, buildWeeklySummaryRows } = require("./summary");
+const { resolveReportUserNames } = require("./user-names");
 
-const WEEKLY_SUMMARY_TEST_RANGE = "'Тест'!A:AG";
+// 🔥 ВСІ ІМПОРТИ
+const { VEHICLE_ACTIVITY_REPORT_ID } = require("./definitions/vehicle-activity");
+const { ARREST_REPORT_ID } = require("./definitions/arrest");
+const { INTERROGATION_REPORT_ID } = require("./definitions/interrogation");
+const { NEGOTIATION_REPORT_ID } = require("./definitions/negotiation");
+const { SEARCH_REPORT_ID } = require("./definitions/search");
+const { TRUCK_BATTLE_REPORT_ID } = require("./definitions/truck-battle");
+const { HOSTAGE_RESCUE_REPORT_ID } = require("./definitions/hostage-rescue");
+const {
+  AIRCRAFT_CARRIER_DEFENSE_REPORT_ID,
+} = require("./definitions/aircraft-carrier-defense");
+const { SUPPLY_REPORT_ID } = require("./definitions/supply");
+const { PATROL_REPORT_ID } = require("./definitions/patrol");
+const { DUTY_REPORT_ID } = require("./definitions/duty");
+const { RAID_REPORT_ID } = require("./definitions/raid");
+const { PURCHASE_REPORT_ID } = require("./definitions/purchase");
+const { BUSINESS_DEFENSE_REPORT_ID } = require("./definitions/business-defense");
+const { RP_ACTIVITY_REPORT_ID } = require("./definitions/rp-activity");
+const { AGITATION_REPORT_ID } = require("./definitions/agitation");
+const { HIRING_REPORT_ID } = require("./definitions/hiring");
+const { VRU_REPORT_ID } = require("./definitions/vru");
+const { SS_CREATION_REPORT_ID } = require("./definitions/ss-creation");
+const { EXAMS_REPORT_ID } = require("./definitions/exams");
+const { PLANE_CRASH_REPORT_ID } = require("./definitions/plane-crash");
+
+// 🔧 ЛИСТ
+const SHEET_NAME = "'Преміальні'";
+
+// 🔧 РЯДКИ
+const START_ROW = 6;
+const END_ROW = 53;
+
+// 🔥 ГОЛОВНА МАПА (❗ прибрав всі || 0)
+const COLUMN_MAP = {
+  [VEHICLE_ACTIVITY_REPORT_ID]: { column: "D" },
+  [ARREST_REPORT_ID]: { column: "E" },
+
+  [`${INTERROGATION_REPORT_ID}_conducted`]: {
+    column: "F",
+    getValue: (c) => c[INTERROGATION_REPORT_ID]?.conducted,
+  },
+
+  [`${INTERROGATION_REPORT_ID}_participated`]: {
+    column: "G",
+    getValue: (c) => c[INTERROGATION_REPORT_ID]?.participated,
+  },
+
+  [SEARCH_REPORT_ID]: { column: "H" },
+
+  [`${NEGOTIATION_REPORT_ID}_controlled`]: {
+    column: "I",
+    getValue: (c) => c[NEGOTIATION_REPORT_ID]?.controlled,
+  },
+
+  [`${NEGOTIATION_REPORT_ID}_conducted`]: {
+    column: "J",
+    getValue: (c) => c[NEGOTIATION_REPORT_ID]?.conducted,
+  },
+
+  [`${TRUCK_BATTLE_REPORT_ID}_failed`]: {
+    column: "K",
+    getValue: (c) => c[TRUCK_BATTLE_REPORT_ID]?.failed,
+  },
+
+  [`${TRUCK_BATTLE_REPORT_ID}_successful`]: {
+    column: "L",
+    getValue: (c) => c[TRUCK_BATTLE_REPORT_ID]?.successful,
+  },
+
+  [`${HOSTAGE_RESCUE_REPORT_ID}_failed`]: {
+    column: "M",
+    getValue: (c) => c[HOSTAGE_RESCUE_REPORT_ID]?.failed,
+  },
+
+  [`${HOSTAGE_RESCUE_REPORT_ID}_successful`]: {
+    column: "N",
+    getValue: (c) => c[HOSTAGE_RESCUE_REPORT_ID]?.successful,
+  },
+
+  [AIRCRAFT_CARRIER_DEFENSE_REPORT_ID]: { column: "O" },
+  [SUPPLY_REPORT_ID]: { column: "P" },
+  [PATROL_REPORT_ID]: { column: "Q" },
+
+  [`${PLANE_CRASH_REPORT_ID}_participation`]: {
+    column: "R",
+    getValue: (c) => c[PLANE_CRASH_REPORT_ID]?.participation,
+  },
+
+  [`${PLANE_CRASH_REPORT_ID}_boxes`]: {
+    column: "S",
+    getValue: (c) => c[PLANE_CRASH_REPORT_ID]?.boxes,
+  },
+
+  [DUTY_REPORT_ID]: { column: "T" },
+  [RAID_REPORT_ID]: { column: "U" },
+  [PURCHASE_REPORT_ID]: { column: "V" },
+
+  [BUSINESS_DEFENSE_REPORT_ID]: { column: "AB" },
+  [RP_ACTIVITY_REPORT_ID]: { column: "AC" },
+  [AGITATION_REPORT_ID]: { column: "AD" },
+  [HIRING_REPORT_ID]: { column: "AE" },
+  [VRU_REPORT_ID]: { column: "AF" },
+  [SS_CREATION_REPORT_ID]: { column: "AG" },
+  [EXAMS_REPORT_ID]: { column: "AH" },
+};
 
 async function runWeeklyReports({
   client,
@@ -15,6 +119,7 @@ async function runWeeklyReports({
 } = {}) {
   const referenceDate = now();
   const period = getCurrentReportPeriod(referenceDate);
+
   const results = [];
 
   for (const report of reports) {
@@ -28,21 +133,85 @@ async function runWeeklyReports({
     results.push(collectedReport);
   }
 
-  const rows = await buildWeeklySummaryRows(results, { client });
-  const writeResult = await writeRows({
-    range: WEEKLY_SUMMARY_TEST_RANGE,
-    rows: rows.length ? [buildWeeklySummaryHeader(), ...rows] : [],
+  const data = await buildWeeklySummaryMap(results, { client });
+
+  // 🔥 ОЧИЩЕННЯ
+  await writeRows({
+    range: `${SHEET_NAME}!D${START_ROW}:AH${END_ROW}`,
+    rows: [],
   });
+
+  await writeColumns(data, { writeRows });
 
   return Object.freeze({
     period,
     reports: results,
-    rows,
-    writeResult,
   });
 }
 
+async function buildWeeklySummaryMap(reports, { client } = {}) {
+  const countsByUserId = new Map();
+
+  for (const report of reports) {
+    for (const participant of report?.result?.participants || []) {
+      const userCounts = countsByUserId.get(participant.userId) || {};
+      userCounts[report.reportId] = participant.count;
+      countsByUserId.set(participant.userId, userCounts);
+    }
+  }
+
+  const participantsWithNames = await resolveReportUserNames(
+    Array.from(countsByUserId.keys()).map((userId) => ({
+      count: 0,
+      userId,
+    })),
+    { client }
+  );
+
+  return participantsWithNames.map((participant) => ({
+    userId: participant.userId,
+    name: participant.name,
+    counts: countsByUserId.get(participant.userId) || {},
+  }));
+}
+
+async function writeColumns(data, { writeRows }) {
+  const rowCount = END_ROW - START_ROW + 1;
+
+  const paddedData = [];
+
+  for (let i = 0; i < rowCount; i++) {
+    paddedData.push(data[i] || { name: "", counts: {} });
+  }
+
+  // 🔥 ІНІЦІАЛИ
+  await writeRows({
+    range: `${SHEET_NAME}!C${START_ROW}:C${END_ROW}`,
+    rows: paddedData.map((u) => [u.name || ""]),
+  });
+
+  // 🔥 КОЛОНКИ (❗ ключова правка тут)
+  for (const [key, config] of Object.entries(COLUMN_MAP)) {
+    if (!config || !config.column) continue;
+
+    await writeRows({
+      range: `${SHEET_NAME}!${config.column}${START_ROW}:${config.column}${END_ROW}`,
+      rows: paddedData.map((u) => {
+        let value = config.getValue
+          ? config.getValue(u.counts)
+          : u.counts[key];
+
+        // 🔥 НЕ ПИСАТИ НУЛІ
+        if (value === 0 || value === undefined || value === null) {
+          return [""];
+        }
+
+        return [value];
+      }),
+    });
+  }
+}
+
 module.exports = {
-  WEEKLY_SUMMARY_TEST_RANGE,
   runWeeklyReports,
 };
