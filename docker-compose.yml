@@ -1,0 +1,12 @@
+services:
+  bot:
+    image: node:24.14.1
+    working_dir: /app
+    env_file:
+      - .env
+    environment:
+      TZ: ${TZ:-Europe/Kyiv}
+    volumes:
+      - .:/app
+    command: ["npm", "start"]
+    restart: unless-stopped
