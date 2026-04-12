@@ -1,6 +1,7 @@
 const { ensureTimeZone } = require("./config/timezone");
 const timeZone = ensureTimeZone();
 const { Client, Events, GatewayIntentBits } = require("discord.js");
+const { handleCommandInteraction, registerCommands } = require("./commands");
 const { startNotifications } = require("./notifications");
 
 const token = process.env.DISCORD_BOT_TOKEN;
@@ -24,6 +25,15 @@ client.once(Events.ClientReady, (readyClient) => {
   console.log(`Бот готовий: ${readyClient.user.tag}`);
   console.log(`Timezone сповіщень: ${timeZone}`);
   startNotifications({ client: readyClient, channelId });
+  registerCommands({ client: readyClient }).catch((error) => {
+    console.error("Не вдалося зареєструвати slash-команди.", error);
+  });
+});
+
+client.on(Events.InteractionCreate, (interaction) => {
+  handleCommandInteraction(interaction).catch((error) => {
+    console.error("Не вдалося обробити Discord interaction.", error);
+  });
 });
 
 client.login(token).catch((error) => {
