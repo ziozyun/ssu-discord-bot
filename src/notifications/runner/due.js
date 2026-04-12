@@ -20,10 +20,11 @@ function findDueNotifications(
 function getDueNotification(notification, currentDate, leadTimeMinutes, missedNotificationLookbackMs = 0) {
   const currentMinute = floorToMinute(currentDate).getTime();
   const earliestNotifyAt = currentMinute - missedNotificationLookbackMs;
+  const notificationLeadTimeMinutes = notification.leadTimeMinutes ?? leadTimeMinutes;
 
   for (const weekOffset of [0, 1]) {
     const scheduledAt = getDateForScheduleEntry(currentDate, notification, weekOffset);
-    const notifyAt = new Date(scheduledAt.getTime() - leadTimeMinutes * MINUTE_IN_MS);
+    const notifyAt = new Date(scheduledAt.getTime() - notificationLeadTimeMinutes * MINUTE_IN_MS);
     const notifyAtTime = notifyAt.getTime();
     const scheduledAtTime = scheduledAt.getTime();
     const isRecentMiss = notifyAtTime >= earliestNotifyAt && notifyAtTime <= currentMinute;

@@ -8,8 +8,8 @@ test("додає івенти з базового розкладу", () => {
   const schedule = createWeeklyNotificationSchedule({});
   const notifications = schedule.flatMap(({ messages }) => messages);
 
-  assert.equal(notifications.length, 49);
-  assert.equal(normalizeWeeklySchedule(schedule).length, 49);
+  assert.equal(notifications.length, 217);
+  assert.equal(normalizeWeeklySchedule(schedule).length, 217);
   assert.equal(hasNotification(notifications, "hammer-war-monday-0000", WEEK_DAYS.MONDAY, "00:00"), true);
   assert.equal(hasNotification(notifications, "hammer-war-sunday-2100", WEEK_DAYS.SUNDAY, "21:00"), true);
   assert.equal(hasNotification(notifications, "truck-battle-monday-0100", WEEK_DAYS.MONDAY, "01:00"), true);
@@ -22,6 +22,11 @@ test("додає івенти з базового розкладу", () => {
   assert.equal(hasNotification(notifications, "plane-crash-sunday-2300", WEEK_DAYS.SUNDAY, "23:00"), true);
   assert.equal(hasNotification(notifications, "truck-battle-monday-1200", WEEK_DAYS.MONDAY, "12:00"), false);
   assert.equal(hasNotification(notifications, "plane-crash-tuesday-1300", WEEK_DAYS.TUESDAY, "13:00"), false);
+  assert.equal(hasNotification(notifications, "hourly-1-1300", WEEK_DAYS.MONDAY, "13:00"), true);
+
+  const hourlyNotification = notifications.find(({ id }) => id === "hourly-1-1300");
+
+  assert.equal(hourlyNotification.leadTimeMinutes, 5);
 });
 
 test("не додає тестове сповіщення без env-прапорця", () => {

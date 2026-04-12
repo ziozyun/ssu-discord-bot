@@ -5,8 +5,9 @@ const {
 const { pruneDispatchCache } = require("./cache");
 const { dispatchNotification } = require("./dispatch");
 const { findDueNotifications, getDueNotification } = require("./due");
+const { createDispatchCacheStore } = require("./store");
 
-const DEFAULT_TICK_INTERVAL_MS = 60 * 1000;
+const DEFAULT_TICK_INTERVAL_MS = 10 * 1000;
 const DEFAULT_MISSED_NOTIFICATION_LOOKBACK_MS = 2 * 60 * 1000;
 
 function createNotificationRunner({
@@ -16,6 +17,7 @@ function createNotificationRunner({
   missedNotificationLookbackMs = DEFAULT_MISSED_NOTIFICATION_LOOKBACK_MS,
   onNotification,
   context = {},
+  dispatchCacheStore = createDispatchCacheStore(),
   logger = console,
   now = () => new Date(),
 } = {}) {
@@ -42,9 +44,12 @@ function createNotificationRunner({
   const notifications = normalizeWeeklySchedule(schedule);
   const dispatchedNotificationKeys = new Map();
   const inFlightNotificationKeys = new Set();
+  const dispatchCacheReady = loadDispatchCache();
   let timer = null;
 
   async function tick(currentDate = now()) {
+    await dispatchCacheReady;
+
     const dueNotifications = findDueNotifications(
       notifications,
       currentDate,
@@ -61,15 +66,30 @@ function createNotificationRunner({
 
         if (wasDispatched) {
           dispatchedNotificationKeys.set(notification.dispatchKey, currentDate.getTime());
+          await dispatchCacheStore.writeCache(dispatchedNotificationKeys);
         }
       } finally {
         inFlightNotificationKeys.delete(notification.dispatchKey);
       }
     }
 
-    pruneDispatchCache(dispatchedNotificationKeys);
+    if (pruneDispatchCache(dispatchedNotificationKeys)) {
+      await dispatchCacheStore.writeCache(dispatchedNotificationKeys);
+    }
 
     return dueNotifications;
+  }
+
+  async function loadDispatchCache() {
+    try {
+      const cachedKeys = await dispatchCacheStore.readCache();
+
+      for (const [dispatchKey, dispatchedAt] of cachedKeys.entries()) {
+        dispatchedNotificationKeys.set(dispatchKey, dispatchedAt);
+      }
+    } catch (error) {
+      logger.error("[notifications] Не вдалося прочитати кеш відправлених сповіщень.", error);
+    }
   }
 
   function start() {

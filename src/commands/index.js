@@ -5,8 +5,10 @@ const {
   PODII_DAY_OPTION_NAME,
   buildEventsCommandResponse,
 } = require("./events");
+const { REPORT_COMMAND, REPORT_COMMAND_NAME, handleReportCommandInteraction } = require("./report");
+const { USER_INFO_COMMANDS, handleUserInfoCommandInteraction } = require("./user-info");
 
-const APPLICATION_COMMANDS = Object.freeze([PODII_COMMAND]);
+const APPLICATION_COMMANDS = Object.freeze([PODII_COMMAND, REPORT_COMMAND, ...USER_INFO_COMMANDS]);
 
 async function registerCommands({
   client,
@@ -37,8 +39,16 @@ async function registerCommands({
 }
 
 async function handleCommandInteraction(interaction, { logger = console, now = () => new Date() } = {}) {
-  if (!interaction.isChatInputCommand() || interaction.commandName !== PODII_COMMAND_NAME) {
+  if (!interaction.isChatInputCommand()) {
     return false;
+  }
+
+  if (interaction.commandName === REPORT_COMMAND_NAME) {
+    return handleReportCommandInteraction(interaction, { logger, now });
+  }
+
+  if (interaction.commandName !== PODII_COMMAND_NAME) {
+    return handleUserInfoCommandInteraction(interaction, { logger, now });
   }
 
   try {

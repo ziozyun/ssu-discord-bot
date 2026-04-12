@@ -41,7 +41,7 @@ function normalizeScheduleMessage(day, message) {
     throw new Error(`Повідомлення для дня ${day} має бути об'єктом.`);
   }
 
-  const { id, time, params = {}, callback } = message;
+  const { id, time, params = {}, callback, leadTimeMinutes } = message;
 
   if (!id || typeof id !== "string") {
     throw new Error(`Повідомлення для дня ${day} має мати string id.`);
@@ -57,12 +57,17 @@ function normalizeScheduleMessage(day, message) {
     throw new Error(`callback для ${id} має бути функцією.`);
   }
 
+  if (leadTimeMinutes !== undefined && (!Number.isInteger(leadTimeMinutes) || leadTimeMinutes < 0)) {
+    throw new Error(`leadTimeMinutes для ${id} має бути невід'ємним цілим числом.`);
+  }
+
   return Object.freeze({
     id,
     day,
     time,
     params: Object.freeze({ ...params }),
     callback,
+    leadTimeMinutes,
   });
 }
 

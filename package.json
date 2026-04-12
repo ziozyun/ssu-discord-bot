@@ -13,6 +13,7 @@
   },
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^14.26.2"
+    "discord.js": "^14.26.2",
+    "googleapis": "^171.4.0"
   }
 }

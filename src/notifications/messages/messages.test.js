@@ -4,6 +4,7 @@ const test = require("node:test");
 const {
   addMinutesToScheduleTime,
   sendHammerWarNotification,
+  sendHourlyNotification,
   sendPlaneCrashNotification,
   sendTestNotification,
   sendTruckBattleNotification,
@@ -201,6 +202,48 @@ test("для ручного запуску показує появу Hummer як
 
   assert.equal(fields["Офіційне повідомлення"], "зараз");
   assert.equal(fields["Поява Hummer"], "через 10 хвилин");
+});
+
+test("відправляє погодинне сповіщення з окремою роллю", async () => {
+  const sentMessages = [];
+
+  process.env.HOURLY_NOTIFICATION_ROLE_ID = "1492882482016817265";
+
+  await sendHourlyNotification(
+    {
+      id: "hourly-sunday-1300",
+      time: "13:00",
+      params: {
+        time: "13:00",
+      },
+    },
+    createDiscordContext(sentMessages),
+  );
+
+  const embed = sentMessages[0].embeds[0].toJSON();
+
+  assert.equal(sentMessages[0].content, "<@&1492882482016817265>");
+  assert.deepEqual(sentMessages[0].allowedMentions, {
+    roles: ["1492882482016817265"],
+  });
+  assert.equal(embed.title, "Автоматична подія");
+  assert.equal(embed.description, undefined);
+  assert.deepEqual(embed.fields, [
+    {
+      name: "Початок",
+      value: "13:00",
+      inline: true,
+    },
+    {
+      name: "Команда для входу",
+      value: "`/joinmp`",
+      inline: true,
+    },
+    {
+      name: "Де писати",
+      value: "У чаті гри",
+    },
+  ]);
 });
 
 function createDiscordContext(sentMessages) {

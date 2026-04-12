@@ -2,7 +2,7 @@ const MAX_DISPATCH_CACHE_SIZE = 1000;
 
 function pruneDispatchCache(dispatchedNotificationKeys) {
   if (dispatchedNotificationKeys.size <= MAX_DISPATCH_CACHE_SIZE) {
-    return;
+    return false;
   }
 
   const keysToDelete = dispatchedNotificationKeys.size - MAX_DISPATCH_CACHE_SIZE;
@@ -13,9 +13,11 @@ function pruneDispatchCache(dispatchedNotificationKeys) {
     deletedKeys += 1;
 
     if (deletedKeys >= keysToDelete) {
-      return;
+      return true;
     }
   }
+
+  return deletedKeys > 0;
 }
 
 module.exports = {

@@ -1,3 +1,6 @@
 .env
 .codex
+data/users.json
+data/notification-dispatch-cache.json
 node_modules/
+secrets/

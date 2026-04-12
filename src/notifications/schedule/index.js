@@ -1,6 +1,7 @@
 const { createTestNotification, TEST_NOTIFICATION_ID } = require("./diagnostic");
 const { WEEK_DAYS } = require("./days");
 const { EVENT_NOTIFICATION_DEFINITIONS } = require("./events");
+const { HOURLY_NOTIFICATION_DEFINITIONS } = require("./hourly");
 const { normalizeWeeklySchedule: normalizeSchedule } = require("./normalize");
 const { parseScheduleTime } = require("./time");
 
@@ -20,6 +21,7 @@ function createWeeklyNotificationSchedule(env = process.env) {
   ];
 
   addEventNotifications(schedule);
+  addHourlyNotifications(schedule);
 
   const testNotification = createTestNotification(env);
 
@@ -42,6 +44,13 @@ function createWeeklyNotificationSchedule(env = process.env) {
 
 function addEventNotifications(schedule) {
   for (const notification of EVENT_NOTIFICATION_DEFINITIONS) {
+    const daySchedule = schedule.find(({ day }) => day === notification.day);
+    daySchedule.messages.push(notification);
+  }
+}
+
+function addHourlyNotifications(schedule) {
+  for (const notification of HOURLY_NOTIFICATION_DEFINITIONS) {
     const daySchedule = schedule.find(({ day }) => day === notification.day);
     daySchedule.messages.push(notification);
   }
