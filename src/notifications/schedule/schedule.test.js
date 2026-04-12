@@ -8,16 +8,20 @@ test("додає івенти з базового розкладу", () => {
   const schedule = createWeeklyNotificationSchedule({});
   const notifications = schedule.flatMap(({ messages }) => messages);
 
-  assert.equal(notifications.length, 42);
-  assert.equal(normalizeWeeklySchedule(schedule).length, 42);
+  assert.equal(notifications.length, 49);
+  assert.equal(normalizeWeeklySchedule(schedule).length, 49);
   assert.equal(hasNotification(notifications, "hammer-war-monday-0000", WEEK_DAYS.MONDAY, "00:00"), true);
   assert.equal(hasNotification(notifications, "hammer-war-sunday-2100", WEEK_DAYS.SUNDAY, "21:00"), true);
-  assert.equal(hasNotification(notifications, "truck-battle-monday-1200", WEEK_DAYS.MONDAY, "12:00"), true);
-  assert.equal(hasNotification(notifications, "truck-battle-tuesday-1500", WEEK_DAYS.TUESDAY, "15:00"), true);
-  assert.equal(hasNotification(notifications, "truck-battle-sunday-1800", WEEK_DAYS.SUNDAY, "18:00"), true);
-  assert.equal(hasNotification(notifications, "plane-crash-tuesday-1300", WEEK_DAYS.TUESDAY, "13:00"), true);
-  assert.equal(hasNotification(notifications, "plane-crash-friday-1600", WEEK_DAYS.FRIDAY, "16:00"), true);
+  assert.equal(hasNotification(notifications, "truck-battle-monday-0100", WEEK_DAYS.MONDAY, "01:00"), true);
+  assert.equal(hasNotification(notifications, "truck-battle-monday-1300", WEEK_DAYS.MONDAY, "13:00"), true);
+  assert.equal(hasNotification(notifications, "truck-battle-tuesday-1600", WEEK_DAYS.TUESDAY, "16:00"), true);
+  assert.equal(hasNotification(notifications, "truck-battle-sunday-1900", WEEK_DAYS.SUNDAY, "19:00"), true);
+  assert.equal(hasNotification(notifications, "plane-crash-monday-2300", WEEK_DAYS.MONDAY, "23:00"), true);
+  assert.equal(hasNotification(notifications, "plane-crash-tuesday-1400", WEEK_DAYS.TUESDAY, "14:00"), true);
+  assert.equal(hasNotification(notifications, "plane-crash-friday-1700", WEEK_DAYS.FRIDAY, "17:00"), true);
   assert.equal(hasNotification(notifications, "plane-crash-sunday-2300", WEEK_DAYS.SUNDAY, "23:00"), true);
+  assert.equal(hasNotification(notifications, "truck-battle-monday-1200", WEEK_DAYS.MONDAY, "12:00"), false);
+  assert.equal(hasNotification(notifications, "plane-crash-tuesday-1300", WEEK_DAYS.TUESDAY, "13:00"), false);
 });
 
 test("не додає тестове сповіщення без env-прапорця", () => {

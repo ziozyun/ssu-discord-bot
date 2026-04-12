@@ -31,12 +31,13 @@ test("до 06:00 сьогодні лишається попереднім ігр
   assert.deepEqual(
     occurrences.map(({ notification }) => notification.id),
     [
-      "plane-crash-saturday-1300",
-      "truck-battle-saturday-1500",
-      "plane-crash-saturday-1900",
+      "plane-crash-saturday-1400",
+      "truck-battle-saturday-1600",
+      "truck-battle-saturday-2000",
       "hammer-war-saturday-2100",
-      "truck-battle-saturday-2200",
+      "plane-crash-saturday-2300",
       "hammer-war-sunday-0000",
+      "truck-battle-sunday-0100",
     ],
   );
 });
@@ -50,9 +51,10 @@ test("після 06:00 сьогодні показує поточний ігро
 
   assert.equal(embed.title, "Події на сьогодні");
   assert.match(embed.description, /неділя 12\.04\.2026 06:00 - понеділок 13\.04\.2026 05:59/);
-  assert.equal(fields["Найближча подія"], "**12:00** - Битва за вантажівку\nПовідомлення: 11:40");
-  assert.match(fields["Розклад"], /\*\*12:00\*\* - Битва за вантажівку\nПовідомлення: 11:40/);
+  assert.equal(fields["Найближча подія"], "**13:00** - Битва за вантажівку\nПовідомлення: 12:40");
+  assert.match(fields["Розклад"], /\*\*13:00\*\* - Битва за вантажівку\nПовідомлення: 12:40/);
   assert.match(fields["Розклад"], /\*\*00:00 \(\+1 день\)\*\* - Війна за Hammer\nПовідомлення: 23:40\nHummer: 00:10 \(\+1 день\)/);
+  assert.match(fields["Розклад"], /\*\*01:00 \(\+1 день\)\*\* - Битва за вантажівку\nПовідомлення: 00:40/);
 });
 
 test("завтра показує розклад без блоку наступної події", () => {

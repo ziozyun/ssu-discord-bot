@@ -37,28 +37,30 @@ const TUESDAY_THURSDAY_SATURDAY = Object.freeze([
 
 const EVENT_NOTIFICATION_DEFINITIONS = Object.freeze([
   ...createDefinitions("hammer-war", ALL_WEEK_DAYS, ["00:00", "21:00"], sendHammerWarNotification),
+  ...createDefinitions("truck-battle", ALL_WEEK_DAYS, ["01:00"], sendTruckBattleNotification),
   ...createDefinitions(
     "truck-battle",
     MONDAY_WEDNESDAY_FRIDAY_SUNDAY,
-    ["12:00", "18:00"],
+    ["13:00", "19:00"],
     sendTruckBattleNotification,
   ),
   ...createDefinitions(
     "truck-battle",
     TUESDAY_THURSDAY_SATURDAY,
-    ["15:00", "22:00"],
+    ["16:00", "20:00"],
     sendTruckBattleNotification,
   ),
+  ...createDefinitions("plane-crash", ALL_WEEK_DAYS, ["23:00"], sendPlaneCrashNotification),
   ...createDefinitions(
     "plane-crash",
     MONDAY_WEDNESDAY_FRIDAY_SUNDAY,
-    ["16:00", "23:00"],
+    ["17:00"],
     sendPlaneCrashNotification,
   ),
   ...createDefinitions(
     "plane-crash",
     TUESDAY_THURSDAY_SATURDAY,
-    ["13:00", "19:00"],
+    ["14:00"],
     sendPlaneCrashNotification,
   ),
 ]);

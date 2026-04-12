@@ -24,8 +24,12 @@ function getDueNotification(notification, currentDate, leadTimeMinutes, missedNo
   for (const weekOffset of [0, 1]) {
     const scheduledAt = getDateForScheduleEntry(currentDate, notification, weekOffset);
     const notifyAt = new Date(scheduledAt.getTime() - leadTimeMinutes * MINUTE_IN_MS);
+    const notifyAtTime = notifyAt.getTime();
+    const scheduledAtTime = scheduledAt.getTime();
+    const isRecentMiss = notifyAtTime >= earliestNotifyAt && notifyAtTime <= currentMinute;
+    const isMissedButBeforeEvent = notifyAtTime <= currentMinute && currentMinute < scheduledAtTime;
 
-    if (notifyAt.getTime() < earliestNotifyAt || notifyAt.getTime() > currentMinute) {
+    if (!isRecentMiss && !isMissedButBeforeEvent) {
       continue;
     }
 
