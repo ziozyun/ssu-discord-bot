@@ -145,6 +145,10 @@ async function runWeeklyReports({
     rows: [],
   });
 
+  // 🔥 ПЕРІОД
+  await writeReportPeriod(period, { writeRows });
+
+  // 🔥 ДАНІ
   await writeColumns(data, { writeRows });
 
   return Object.freeze({
@@ -188,13 +192,13 @@ async function writeColumns(data, { writeRows }) {
     paddedData.push(data[i] || { name: "", counts: {} });
   }
 
-  // 🔥 ІНІЦІАЛИ
+  // 🔥 ІМЕНА
   await writeRows({
     range: `${SHEET_NAME}!C${START_ROW}:C${END_ROW}`,
     rows: paddedData.map((u) => [u.name || ""]),
   });
 
-  // 🔥 КОЛОНКИ (❗ ключова правка тут)
+  // 🔥 КОЛОНКИ
   for (const [key, config] of Object.entries(COLUMN_MAP)) {
     if (!config || !config.column) continue;
 
@@ -214,6 +218,25 @@ async function writeColumns(data, { writeRows }) {
       }),
     });
   }
+}
+
+// 🔥 ПЕРІОД
+function formatDate(date) {
+  return new Intl.DateTimeFormat("uk-UA", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: process.env.TZ || "Europe/Kyiv",
+  }).format(date);
+}
+
+async function writeReportPeriod(period, { writeRows }) {
+  const text = `В ПЕРІОД З ${formatDate(period.startDate)} ПО ${formatDate(period.endDate)}`;
+
+  await writeRows({
+    range: `${SHEET_NAME}!C5`,
+    rows: [[text]],
+  });
 }
 
 module.exports = {
