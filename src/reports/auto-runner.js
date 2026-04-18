@@ -81,8 +81,21 @@ function startWeeklyReportAutoRunner({
     }
   }
 
+  async function handleMessageReactionRemove(reaction, user) {
+    if (user?.bot) {
+      return;
+    }
+
+    const channelId = await getReactionChannelId(reaction);
+
+    if (reportChannelIds.has(channelId)) {
+      scheduleRun(`прибрано реакцію ${formatReactionName(reaction)} від ${user.id} у каналі ${channelId}`);
+    }
+  }
+
   client.on(Events.MessageCreate, handleMessageCreate);
   client.on(Events.MessageReactionAdd, handleMessageReactionAdd);
+  client.on(Events.MessageReactionRemove, handleMessageReactionRemove);
 
   logger.info?.(`[reports] Автоматичне формування звітів увімкнено після ${delayMinutes} хв. тиші у звітних каналах.`);
   logger.info?.(`[reports] Відстежується звітних каналів: ${reportChannelIds.size}.`);
@@ -97,6 +110,7 @@ function startWeeklyReportAutoRunner({
 
       client.off(Events.MessageCreate, handleMessageCreate);
       client.off(Events.MessageReactionAdd, handleMessageReactionAdd);
+      client.off(Events.MessageReactionRemove, handleMessageReactionRemove);
     },
   };
 }
