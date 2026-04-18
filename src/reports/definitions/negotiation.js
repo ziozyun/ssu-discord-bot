@@ -1,4 +1,5 @@
 const { shouldIgnoreReportMessage } = require("../common");
+const { getWhiteCheckMarkReactionUserIds } = require("../participants");
 
 const NEGOTIATION_REPORT_ID = "Перемовини";
 
@@ -6,12 +7,12 @@ const NEGOTIATION_REPORT = Object.freeze({
   id: NEGOTIATION_REPORT_ID,
   channelIds: getNegotiationChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countNegotiationParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countNegotiationParticipants(messages),
   }),
 });
 
-function countNegotiationParticipants(messages) {
+async function countNegotiationParticipants(messages) {
   const counts = new Map();
 
   for (const message of messages) {
@@ -19,7 +20,12 @@ function countNegotiationParticipants(messages) {
       incrementNegotiationCount(counts, message.author.id, "conducted");
     }
 
-    for (const userId of getMentionedUserIds(message)) {
+    const participantUserIds = new Set([
+      ...getMentionedUserIds(message),
+      ...(await getWhiteCheckMarkReactionUserIds(message)),
+    ]);
+
+    for (const userId of participantUserIds) {
       if (userId === message?.author?.id) {
         continue;
       }

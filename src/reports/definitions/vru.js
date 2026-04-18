@@ -7,8 +7,8 @@ const VRU_REPORT = Object.freeze({
   id: VRU_REPORT_ID,
   channelIds: getVruChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countMessageParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countMessageParticipants(messages),
   }),
 });
 

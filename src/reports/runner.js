@@ -1,11 +1,14 @@
+const { createLogger } = require("../logger");
 const { getCurrentReportPeriod } = require("./period");
 const { fetchReportMessages } = require("./messages");
+
+const DEFAULT_LOGGER = createLogger("reports");
 
 async function collectReport({
   client,
   report,
   now = () => new Date(),
-  logger = console,
+  logger = DEFAULT_LOGGER,
 } = {}) {
   if (!report?.id) {
     throw new Error("report має містити id.");

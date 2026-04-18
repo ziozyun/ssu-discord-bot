@@ -7,8 +7,8 @@ const ARREST_REPORT = Object.freeze({
   id: ARREST_REPORT_ID,
   channelIds: getArrestChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countMessageParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countMessageParticipants(messages),
   }),
 });
 

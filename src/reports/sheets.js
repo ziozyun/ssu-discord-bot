@@ -49,9 +49,27 @@ async function writeSheetRows({
   };
 }
 
+async function readSheetRows({
+  range,
+  sheets = createSheetsClient(),
+  spreadsheetId = process.env.GOOGLE_SHEETS_SPREADSHEET_ID || DEFAULT_SPREADSHEET_ID,
+} = {}) {
+  if (!range) {
+    throw new Error("range є обов'язковим для читання з Google Sheets.");
+  }
+
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range,
+  });
+
+  return response.data.values || [];
+}
+
 module.exports = {
   DEFAULT_GOOGLE_CREDENTIALS_FILE,
   DEFAULT_SPREADSHEET_ID,
   createSheetsClient,
+  readSheetRows,
   writeSheetRows,
 };

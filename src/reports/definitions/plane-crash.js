@@ -7,18 +7,18 @@ const PLANE_CRASH_REPORT = Object.freeze({
   id: PLANE_CRASH_REPORT_ID,
   channelIds: getPlaneCrashChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countPlaneCrashParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countPlaneCrashParticipants(messages),
   }),
 });
 
-function countPlaneCrashParticipants(messages) {
+async function countPlaneCrashParticipants(messages) {
   const counts = new Map();
 
   for (const message of messages) {
     const boxCount = extractPlaneCrashBoxCount(getMessageContent(message));
 
-    for (const userId of getMessageParticipantIds(message)) {
+    for (const userId of await getMessageParticipantIds(message)) {
       incrementPlaneCrashCount(counts, userId, boxCount);
     }
   }

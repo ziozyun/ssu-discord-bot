@@ -7,8 +7,8 @@ const EXAMS_REPORT = Object.freeze({
   id: EXAMS_REPORT_ID,
   channelIds: getExamsChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countMessageParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countMessageParticipants(messages),
   }),
 });
 

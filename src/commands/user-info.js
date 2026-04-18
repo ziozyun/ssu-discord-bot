@@ -1,6 +1,8 @@
 const { ApplicationCommandOptionType, EmbedBuilder, MessageFlags, PermissionsBitField } = require("discord.js");
+const { createLogger } = require("../logger");
 const { createUserInfoStore } = require("../users/store");
 
+const DEFAULT_LOGGER = createLogger("commands");
 const CARD_NUMBER_COMMAND_NAME = "номер_карти";
 const INITIALS_COMMAND_NAME = "ініціали";
 const MY_INFO_COMMAND_NAME = "інформація_про_мене";
@@ -58,7 +60,7 @@ const USER_INFO_COMMANDS = Object.freeze([CARD_NUMBER_COMMAND, INITIALS_COMMAND,
 async function handleUserInfoCommandInteraction(
   interaction,
   {
-    logger = console,
+    logger = DEFAULT_LOGGER,
     store = createUserInfoStore(),
     adminRoleId = process.env.USER_DATA_ADMIN_ROLE_ID,
     now = () => new Date(),

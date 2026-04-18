@@ -7,8 +7,8 @@ const RP_ACTIVITY_REPORT = Object.freeze({
   id: RP_ACTIVITY_REPORT_ID,
   channelIds: getRpActivityChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countMessageParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countMessageParticipants(messages),
   }),
 });
 

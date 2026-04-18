@@ -7,8 +7,8 @@ const AGITATION_REPORT = Object.freeze({
   id: AGITATION_REPORT_ID,
   channelIds: getAgitationChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countMessageParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countMessageParticipants(messages),
   }),
 });
 

@@ -7,8 +7,8 @@ const BUSINESS_DEFENSE_REPORT = Object.freeze({
   id: BUSINESS_DEFENSE_REPORT_ID,
   channelIds: getBusinessDefenseChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countMessageParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countMessageParticipants(messages),
   }),
 });
 

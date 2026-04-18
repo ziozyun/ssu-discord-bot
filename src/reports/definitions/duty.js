@@ -7,19 +7,19 @@ const DUTY_REPORT = Object.freeze({
   id: DUTY_REPORT_ID,
   channelIds: getDutyChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countDutyParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countDutyParticipants(messages),
   }),
 });
 
-function countDutyParticipants(messages) {
+async function countDutyParticipants(messages) {
   const counts = new Map();
 
   for (const message of messages) {
     const content = getMessageContent(message);
     const hours = extractDutyHours(content);
 
-    const participantIds = getMessageParticipantIds(message);
+    const participantIds = await getMessageParticipantIds(message);
 
     for (const userId of participantIds) {
       incrementDutyCount(counts, userId, hours);

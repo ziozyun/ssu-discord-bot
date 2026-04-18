@@ -7,12 +7,12 @@ const PATROL_REPORT = Object.freeze({
   id: PATROL_REPORT_ID,
   channelIds: getPatrolChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countPatrolParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countPatrolParticipants(messages),
   }),
 });
 
-function countPatrolParticipants(messages) {
+async function countPatrolParticipants(messages) {
   const counts = new Map();
 
   for (const message of messages) {
@@ -20,17 +20,10 @@ function countPatrolParticipants(messages) {
 
     const hours = extractPatrolHours(content);
 
-    const participantIds = getMessageParticipantIds(message);
+    const participantIds = await getMessageParticipantIds(message);
 
     for (const userId of participantIds) {
       incrementPatrolCount(counts, userId, hours);
-
-      console.log(
-        "[PATROL] updated",
-        userId,
-        "=>",
-        counts.get(userId)
-      );
     }
   }
 
@@ -60,14 +53,9 @@ function extractPatrolHours(content) {
   const start = parseDate(startMatch[1], startMatch[2]);
   const end = parseDate(endMatch[1], endMatch[2]);
 
-  if (!start || !end) {
-    console.log("[PATROL] ❌ invalid date");
-    return 0;
-  }
+  if (!start || !end) return 0;
 
   const diffMinutes = (end - start) / (1000 * 60);
-
-  console.log("[PATROL] diffMinutes =", diffMinutes);
 
   if (diffMinutes <= 0) return 0;
 

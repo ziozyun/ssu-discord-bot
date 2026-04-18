@@ -7,8 +7,8 @@ const SUPPLY_REPORT = Object.freeze({
   id: SUPPLY_REPORT_ID,
   channelIds: getSupplyChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countMessageParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countMessageParticipants(messages),
   }),
 });
 

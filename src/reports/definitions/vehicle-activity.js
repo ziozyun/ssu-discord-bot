@@ -7,8 +7,8 @@ const VEHICLE_ACTIVITY_REPORT = Object.freeze({
   id: VEHICLE_ACTIVITY_REPORT_ID,
   channelIds: getVehicleActivityChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countMessageParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countMessageParticipants(messages),
   }),
 });
 

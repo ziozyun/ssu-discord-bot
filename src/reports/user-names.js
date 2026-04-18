@@ -98,7 +98,7 @@ function compareReportNames(left, right) {
 function normalizeName(value) {
   return String(value || "")
     .trim()
-    .replace(/^(?:\[[^\]]+\]\s*)+/u, "")
+    .replace(/\[[^\]]*\]\s*/gu, "")
     .replace(/\s+/g, " ");
 }
 

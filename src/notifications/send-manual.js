@@ -1,5 +1,6 @@
 const { Client, Events, GatewayIntentBits } = require("discord.js");
 const { ensureTimeZone } = require("../config/timezone");
+const { createLogger } = require("../logger");
 const {
   sendHammerWarNotification,
   sendPlaneCrashNotification,
@@ -7,6 +8,7 @@ const {
   sendTruckBattleNotification,
 } = require("./messages");
 
+const logger = createLogger("manual-notification");
 const timeZone = ensureTimeZone();
 const token = process.env.DISCORD_BOT_TOKEN;
 const channelId = process.env.NOTIFICATION_CHANNEL_ID;
@@ -39,18 +41,18 @@ const manualNotifications = Object.freeze({
 const manualNotification = manualNotifications[notificationKey];
 
 if (!manualNotification) {
-  console.error(`Невідоме повідомлення для ручної відправки: ${notificationKey}.`);
-  console.error(`Доступні варіанти: ${Object.keys(manualNotifications).join(", ")}.`);
+  logger.error(`Невідоме повідомлення для ручної відправки: ${notificationKey}.`);
+  logger.error(`Доступні варіанти: ${Object.keys(manualNotifications).join(", ")}.`);
   process.exit(1);
 }
 
 if (!token) {
-  console.error("Не задано DISCORD_BOT_TOKEN.");
+  logger.error("Не задано DISCORD_BOT_TOKEN.");
   process.exit(1);
 }
 
 if (!channelId) {
-  console.error("Не задано NOTIFICATION_CHANNEL_ID.");
+  logger.error("Не задано NOTIFICATION_CHANNEL_ID.");
   process.exit(1);
 }
 
@@ -59,8 +61,8 @@ const client = new Client({
 });
 
 client.once(Events.ClientReady, async (readyClient) => {
-  console.log(`Бот готовий: ${readyClient.user.tag}`);
-  console.log(`Timezone сповіщень: ${timeZone}`);
+  logger.info(`Бот готовий: ${readyClient.user.tag}.`);
+  logger.info(`Timezone сповіщень: ${timeZone}.`);
 
   try {
     await manualNotification.callback(
@@ -75,13 +77,13 @@ client.once(Events.ClientReady, async (readyClient) => {
       {
         client: readyClient,
         channelId,
-        logger: console,
+        logger,
       },
     );
 
-    console.log(`Повідомлення "${manualNotification.name}" відправлено.`);
+    logger.info(`Повідомлення "${manualNotification.name}" відправлено.`);
   } catch (error) {
-    console.error(`Не вдалося відправити повідомлення "${manualNotification.name}".`, error);
+    logger.error(`Не вдалося відправити повідомлення "${manualNotification.name}".`, error);
     process.exitCode = 1;
   } finally {
     readyClient.destroy();
@@ -89,6 +91,6 @@ client.once(Events.ClientReady, async (readyClient) => {
 });
 
 client.login(token).catch((error) => {
-  console.error("Не вдалося залогінити Discord-бота.", error);
+  logger.error("Не вдалося залогінити Discord-бота.", error);
   process.exit(1);
 });

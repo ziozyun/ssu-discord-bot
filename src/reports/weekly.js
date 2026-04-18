@@ -1,4 +1,5 @@
 const { REPORT_DEFINITIONS } = require("./definitions");
+const { createLogger } = require("../logger");
 const { getCurrentReportPeriod } = require("./period");
 const { collectReport } = require("./runner");
 const { writeSheetRows } = require("./sheets");
@@ -31,6 +32,7 @@ const { PLANE_CRASH_REPORT_ID } = require("./definitions/plane-crash");
 
 // 🔧 ЛИСТ
 const SHEET_NAME = "'Преміальні'";
+const DEFAULT_LOGGER = createLogger("reports");
 
 // 🔧 РЯДКИ
 const START_ROW = 6;
@@ -118,7 +120,7 @@ async function runWeeklyReports({
   client,
   reports = REPORT_DEFINITIONS,
   now = () => new Date(),
-  logger = console,
+  logger = DEFAULT_LOGGER,
   writeRows = writeSheetRows,
 } = {}) {
   const referenceDate = now();

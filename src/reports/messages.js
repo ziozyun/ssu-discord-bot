@@ -1,11 +1,14 @@
+const { createLogger } = require("../logger");
+
 const DEFAULT_PAGE_LIMIT = 100;
+const DEFAULT_LOGGER = createLogger("reports");
 
 async function fetchReportMessages({
   client,
   channelIds,
   period,
   pageLimit = DEFAULT_PAGE_LIMIT,
-  logger = console,
+  logger = DEFAULT_LOGGER,
 } = {}) {
   if (!client?.channels?.fetch) {
     throw new Error("Немає Discord client для збору повідомлень.");

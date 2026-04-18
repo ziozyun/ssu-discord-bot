@@ -10,13 +10,13 @@ function createStatusReport({
     id,
     channelIds,
     filterMessage: (message) => !shouldIgnoreReportMessage(message),
-    buildResult: (messages) => ({
-      participants: countStatusParticipants(messages),
+    buildResult: async (messages) => ({
+      participants: await countStatusParticipants(messages),
     }),
   });
 }
 
-function countStatusParticipants(messages) {
+async function countStatusParticipants(messages) {
   const counts = new Map();
 
   for (const message of messages) {
@@ -26,7 +26,7 @@ function countStatusParticipants(messages) {
       continue;
     }
 
-    for (const userId of getMessageParticipantIds(message)) {
+    for (const userId of await getMessageParticipantIds(message)) {
       incrementStatusCount(counts, userId, resultKey);
     }
   }

@@ -7,8 +7,8 @@ const SS_CREATION_REPORT = Object.freeze({
   id: SS_CREATION_REPORT_ID,
   channelIds: getSsCreationChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countMessageParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countMessageParticipants(messages),
   }),
 });
 

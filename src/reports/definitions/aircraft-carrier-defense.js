@@ -7,8 +7,8 @@ const AIRCRAFT_CARRIER_DEFENSE_REPORT = Object.freeze({
   id: AIRCRAFT_CARRIER_DEFENSE_REPORT_ID,
   channelIds: getAircraftCarrierDefenseChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countMessageParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countMessageParticipants(messages),
   }),
 });
 

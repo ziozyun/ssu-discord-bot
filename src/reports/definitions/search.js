@@ -7,8 +7,8 @@ const SEARCH_REPORT = Object.freeze({
   id: SEARCH_REPORT_ID,
   channelIds: getSearchChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countMessageParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countMessageParticipants(messages),
   }),
 });
 

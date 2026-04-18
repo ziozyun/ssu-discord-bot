@@ -7,8 +7,8 @@ const PURCHASE_REPORT = Object.freeze({
   id: PURCHASE_REPORT_ID,
   channelIds: getPurchaseChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countMessageParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countMessageParticipants(messages),
   }),
 });
 

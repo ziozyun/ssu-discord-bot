@@ -1,6 +1,10 @@
+const { createLogger } = require("../../logger");
+
+const DEFAULT_LOGGER = createLogger("notifications");
+
 async function sendDiscordChannelMessage(
   message,
-  { client, channelId, roleId = process.env.NOTIFICATION_ROLE_ID, logger = console, notification } = {},
+  { client, channelId, roleId = process.env.NOTIFICATION_ROLE_ID, logger = DEFAULT_LOGGER, notification } = {},
 ) {
   if (!message) {
     logger.info(`[notifications] Порожнє повідомлення для сповіщення ${notification?.id || "без id"}.`);

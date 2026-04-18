@@ -1,6 +1,8 @@
 const { EmbedBuilder, MessageFlags } = require("discord.js");
+const { createLogger } = require("../logger");
 const { runWeeklyReports } = require("../reports/weekly");
 
+const DEFAULT_LOGGER = createLogger("commands");
 const REPORT_COMMAND_NAME = "звіт";
 
 const REPORT_COMMAND = Object.freeze({
@@ -11,7 +13,7 @@ const REPORT_COMMAND = Object.freeze({
 async function handleReportCommandInteraction(
   interaction,
   {
-    logger = console,
+    logger = DEFAULT_LOGGER,
     now = () => new Date(),
     runReports = runWeeklyReports,
   } = {},

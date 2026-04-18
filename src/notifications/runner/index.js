@@ -1,3 +1,4 @@
+const { createLogger } = require("../../logger");
 const {
   NOTIFICATION_LEAD_TIME_MINUTES,
   normalizeWeeklySchedule,
@@ -9,6 +10,7 @@ const { createDispatchCacheStore } = require("./store");
 
 const DEFAULT_TICK_INTERVAL_MS = 10 * 1000;
 const DEFAULT_MISSED_NOTIFICATION_LOOKBACK_MS = 2 * 60 * 1000;
+const DEFAULT_LOGGER = createLogger("notifications");
 
 function createNotificationRunner({
   schedule,
@@ -18,7 +20,7 @@ function createNotificationRunner({
   onNotification,
   context = {},
   dispatchCacheStore = createDispatchCacheStore(),
-  logger = console,
+  logger = DEFAULT_LOGGER,
   now = () => new Date(),
 } = {}) {
   if (!Number.isInteger(leadTimeMinutes) || leadTimeMinutes < 0) {

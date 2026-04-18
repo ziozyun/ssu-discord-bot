@@ -1,4 +1,5 @@
 const { shouldIgnoreReportMessage } = require("../common");
+const { getWhiteCheckMarkReactionUserIds } = require("../participants");
 
 const INTERROGATION_REPORT_ID = "Допит";
 
@@ -6,12 +7,12 @@ const INTERROGATION_REPORT = Object.freeze({
   id: INTERROGATION_REPORT_ID,
   channelIds: getInterrogationChannelIds(),
   filterMessage: (message) => !shouldIgnoreReportMessage(message),
-  buildResult: (messages) => ({
-    participants: countInterrogationParticipants(messages),
+  buildResult: async (messages) => ({
+    participants: await countInterrogationParticipants(messages),
   }),
 });
 
-function countInterrogationParticipants(messages) {
+async function countInterrogationParticipants(messages) {
   const counts = new Map();
 
   for (const message of messages) {
@@ -19,7 +20,12 @@ function countInterrogationParticipants(messages) {
       incrementInterrogationCount(counts, message.author.id, "conducted");
     }
 
-    for (const userId of getMentionedUserIds(message)) {
+    const participantUserIds = new Set([
+      ...getMentionedUserIds(message),
+      ...(await getWhiteCheckMarkReactionUserIds(message)),
+    ]);
+
+    for (const userId of participantUserIds) {
       if (userId === message?.author?.id) {
         continue;
       }
